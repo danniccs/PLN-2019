@@ -1,0 +1,3 @@
+# Don't track these
+notebooks/.ipynb_checkpoints
+pln_2019.egg-info/
