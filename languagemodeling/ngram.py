@@ -53,7 +53,25 @@ class NGram(LanguageModel):
 
         count = defaultdict(int)
 
-        # WORK HERE!!
+        for sent in sents:
+            if n > 1:
+                sent_fixed = (n-1)*['<s>'] + sent + ['</s>']
+
+            for i in range(len(sent_fixed) - n + 1):
+                ngram = tuple(sent_fixed[i:i+n])
+                count[ngram] += 1
+                # Me salto la primera '<s>' para contar los n-1 gramas
+                # para no leer una lista de '<s>'
+                if i > 0 and n > 1:
+                    nminusgram = tuple(sent_fixed[i:i+n-1])
+                    count[nminusgram] += 1
+
+            # Leo el último n-1 grama
+            if n > 1:
+                nminusgram = tuple(sent_fixed[len(sent_fixed) - n + 2:
+                                              len(sent_fixed) + 1])
+                count[nminusgram] += 1
+
 
         self._count = dict(count)
 

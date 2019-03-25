@@ -16,7 +16,7 @@ Options:
 from docopt import docopt
 import pickle
 
-from nltk.corpus import gutenberg
+from nltk.corpus import PlaintextCorpusReader
 
 from languagemodeling.ngram import NGram
 
@@ -31,7 +31,10 @@ if __name__ == '__main__':
 
     # load the data
     # WORK HERE!! LOAD YOUR TRAINING CORPUS
-    sents = gutenberg.sents(['austen-emma.txt', 'austen-sense.txt'])
+    screenplay_dir = '/home/danniccs/pln/PLN-2019/ScreenplayTXTs'
+    my_corpus = PlaintextCorpusReader(screenplay_dir, '.*\.txt')
+
+    sents = my_corpus.sents()
 
     # train the model
     n = int(opts['-n'])

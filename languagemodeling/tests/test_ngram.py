@@ -92,7 +92,8 @@ class TestNGram(TestCase):
             'la la la': (1 / 6.0)**1 * (1 / 12.0)**3,
         }
         for sent, prob in sents.items():
-            self.assertAlmostEqual(ngram.sent_prob(sent.split()), prob, msg=sent)
+            self.assertAlmostEqual(ngram.sent_prob(sent.split()),
+                                   prob, msg=sent)
 
     def test_sent_prob_2gram(self):
         ngram = NGram(2, self.sents)
@@ -108,7 +109,8 @@ class TestNGram(TestCase):
             'la la la': 0.0,  # 'la' after 'la' unseen
         }
         for sent, prob in sents.items():
-            self.assertAlmostEqual(ngram.sent_prob(sent.split()), prob, msg=sent)
+            self.assertAlmostEqual(ngram.sent_prob(sent.split()),
+                                   prob, msg=sent)
 
     def test_sent_log_prob_1gram(self):
         ngram = NGram(1, self.sents)
@@ -122,7 +124,8 @@ class TestNGram(TestCase):
             'la la la': log2(1 / 6.0) + 3 * log2(1 / 12.0),
         }
         for sent, prob in sents.items():
-            self.assertAlmostEqual(ngram.sent_log_prob(sent.split()), prob, msg=sent)
+            self.assertAlmostEqual(ngram.sent_log_prob(sent.split()),
+                                   prob, msg=sent)
 
     def test_sent_log_prob_2gram(self):
         ngram = NGram(2, self.sents)
@@ -139,4 +142,5 @@ class TestNGram(TestCase):
             'la la la': -inf,  # 'la' after 'la' unseen
         }
         for sent, prob in sents.items():
-            self.assertAlmostEqual(ngram.sent_log_prob(sent.split()), prob, msg=sent)
+            self.assertAlmostEqual(ngram.sent_log_prob(sent.split()),
+                                   prob, msg=sent)
