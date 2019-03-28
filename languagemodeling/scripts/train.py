@@ -1,7 +1,8 @@
 """Train an n-gram model.
 
 Usage:
-  train.py [-m <model>] -n <n> -o <file>
+  train.py [-m <model>] -n <n> -r <root> -o <file>
+
   train.py -h | --help
 
 Options:
@@ -10,6 +11,7 @@ Options:
                   ngram: Unsmoothed n-grams.
                   addone: N-grams with add-one smoothing.
                   inter: N-grams with interpolation smoothing.
+  -r <root>     Input corpus root.
   -o <file>     Output model file.
   -h --help     Show this screen.
 """
@@ -31,7 +33,7 @@ if __name__ == '__main__':
 
     # load the data
     # WORK HERE!! LOAD YOUR TRAINING CORPUS
-    screenplay_dir = '/home/danniccs/pln/PLN-2019/ScreenplayTXTs'
+    screenplay_dir = opts['-r']
     my_corpus = PlaintextCorpusReader(screenplay_dir, '.*\.txt')
 
     sents = my_corpus.sents()

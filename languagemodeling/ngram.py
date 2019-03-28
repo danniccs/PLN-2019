@@ -72,7 +72,6 @@ class NGram(LanguageModel):
                                               len(sent_fixed) + 1])
                 count[nminusgram] += 1
 
-
         self._count = dict(count)
 
     def count(self, tokens):
@@ -88,21 +87,51 @@ class NGram(LanguageModel):
         token -- the token.
         prev_tokens -- the previous n-1 tokens (optional only if n = 1).
         """
-        # WORK HERE!!
+
+        if self._n > 1:
+            denominator = self.count(prev_tokens)
+        else:
+            denominator = 0
+            for token in self._count:
+                denominator += self.count(token) 
+
+        numerator_list = list(prev_tokens)
+        numerator_list.append(token)
+        numerator = self.count(tuple(numerator_list))
+
+        if denominator > 0:
+            prob = numerator/denominator
+        else:
+            prob = 0
+        return prob
 
     def sent_prob(self, sent):
         """Probability of a sentence. Warning: subject to underflow problems.
 
         sent -- the sentence as a list of tokens.
         """
-        # WORK HERE !!
+
+        n = self._n
+        prob = 1
+        fixed_sent = (n-1)*['<s>'] + sent + ['</s>']
+
+        if n > 1:
+            for i in range(n - 1, len(fixed_sent)):
+                prev = tuple(fixed_sent[i - (n - 1):i])
+                word = fixed_sent[i]
+                prob *= self.cond_prob(word, prev) 
+        else:
+            prob *= self.cond_prob(word)
+
+        return prob
 
     def sent_log_prob(self, sent):
         """Log-probability of a sentence.
 
         sent -- the sentence as a list of tokens.
         """
-        # WORK HERE!!
+
+        return math.log(self.sent_prob(sent))
 
 
 class AddOneNGram(NGram):
