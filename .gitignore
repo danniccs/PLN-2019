@@ -2,4 +2,5 @@
 notebooks/.ipynb_checkpoints
 pln_2019.egg-info/
 ScreenplayTXTs/
-languagemodeling/__pycache__
+__pycache__/
+tst.txt

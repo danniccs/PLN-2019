@@ -54,21 +54,20 @@ class NGram(LanguageModel):
         count = defaultdict(int)
 
         for sent in sents:
-            if n > 1:
-                sent_fixed = (n-1)*['<s>'] + sent + ['</s>']
+
+            sent_fixed = (n-1)*['<s>'] + sent + ['</s>']
 
             for i in range(len(sent_fixed) - n + 1):
                 ngram = tuple(sent_fixed[i:i+n])
                 count[ngram] += 1
 
-                if n > 1:
-                    nminusgram = tuple(sent_fixed[i:i+n-1])
-                    count[nminusgram] += 1
+                nminusgram = tuple(sent_fixed[i:i+n-1])
+                count[nminusgram] += 1
 
-            # Leo el último n-1 grama
+            # Leo el último n-1 grama si n>1
             if n > 1:
-                nminusgram = tuple(sent_fixed[len(sent_fixed) - n + 2:
-                                              len(sent_fixed) + 1])
+                nminusgram = tuple(sent_fixed[len(sent_fixed) - n + 1:
+                                              len(sent_fixed)])
                 count[nminusgram] += 1
 
         self._count = dict(count)
@@ -89,12 +88,11 @@ class NGram(LanguageModel):
 
         if self._n > 1:
             denominator = self.count(prev_tokens)
+            numerator_list = list(prev_tokens)
         else:
-            denominator = 0
-            for token in self._count:
-                denominator += self.count(token) 
+            denominator = self.count(()) 
+            numerator_list = []
 
-        numerator_list = list(prev_tokens)
         numerator_list.append(token)
         numerator = self.count(tuple(numerator_list))
 
@@ -102,6 +100,7 @@ class NGram(LanguageModel):
             prob = numerator/denominator
         else:
             prob = 0
+
         return prob
 
     def sent_prob(self, sent):
@@ -114,13 +113,14 @@ class NGram(LanguageModel):
         prob = 1
         fixed_sent = (n-1)*['<s>'] + sent + ['</s>']
 
-        if n > 1:
-            for i in range(n - 1, len(fixed_sent)):
-                prev = tuple(fixed_sent[i - (n - 1):i])
-                word = fixed_sent[i]
-                prob *= self.cond_prob(word, prev) 
-        else:
-            prob *= self.cond_prob(word)
+        for i in range(n - 1, len(fixed_sent)):
+            prev = tuple(fixed_sent[i - (n - 1):i])
+            word = fixed_sent[i]
+
+            if prev is not (): 
+                prob *= self.cond_prob(word, prev)
+            else:
+                prob *= self.cond_prob(word)
 
         return prob
 
@@ -130,8 +130,13 @@ class NGram(LanguageModel):
         sent -- the sentence as a list of tokens.
         """
 
-        return math.log(self.sent_prob(sent))
+        prob = self.sent_prob(sent)
+        if prob > 0:
+            log_prob = math.log(prob, 2)
+        else:
+            log_prob = -math.inf
 
+        return log_prob
 
 class AddOneNGram(NGram):
 

@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # load the data
     # WORK HERE!! LOAD YOUR TRAINING CORPUS
     screenplay_dir = opts['-r']
-    my_corpus = PlaintextCorpusReader(screenplay_dir, '.*\.txt')
+    my_corpus = PlaintextCorpusReader(screenplay_dir, '.*.txt')
 
     sents = my_corpus.sents()
 
