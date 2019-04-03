@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import random
 
 
@@ -12,13 +12,27 @@ class NGramGenerator(object):
 
         # compute the probabilities
         probs = defaultdict(dict)
-        # WORK HERE!!
+
+        for ngram in model._count:
+            if len(ngram) == self._n:
+                token = ngram[self._n - 1]
+                if self._n > 1:
+                    minusgram = ngram[:self._n - 1]
+                    (probs[minusgram])[token] = model.cond_prob(token, nminusgram)
+                else:
+                    minusgram = ()
+                    (probs[minusgram])[token] = model.cond_prob(token)
 
         self._probs = dict(probs)
 
         # sort in descending order for efficient sampling
-        self._sorted_probs = sorted_probs = {}
-        # WORK HERE!!
+
+        sorted_probs = defaultdict(OrderedDict)
+        for minusgram, prob in probs.items():
+            sorted_prob = OrderedDict(sorted(prob.items(), key=lambda pair: pair[1]))
+            sorted_probs[minusgram] = sorted_prob
+
+        self._sorted_probs = sorted_probs
 
     def generate_sent(self):
         """Randomly generate a sentence."""
