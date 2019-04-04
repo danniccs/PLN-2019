@@ -24,22 +24,34 @@ class LanguageModel(object):
 
         sents -- the sentences.
         """
-        # WORK HERE!!
+        log_sum = 0
+        for sent in sents:
+            log_sum += self.sent_log_prob(sent)
+
+        return log_sum
 
     def cross_entropy(self, sents):
         """Cross-entropy of a list of sentences.
 
         sents -- the sentences.
         """
-        # WORK HERE!!
+        # calculate log probability again so as not to go over list twice
+        M = 0
+        log_sum = 0
+
+        for sent in sents:
+            for token in sent:
+                M += 1
+            log_sum += self.sent_log_prob(sent)
+
+        return -1*(log_sum / M)
 
     def perplexity(self, sents):
         """Perplexity of a list of sentences.
 
         sents -- the sentences.
         """
-        # WORK HERE!!
-
+        return 2 ** self.cross_entropy(sents)
 
 class NGram(LanguageModel):
 
@@ -150,7 +162,13 @@ class AddOneNGram(NGram):
 
         # compute vocabulary
         self._voc = voc = set()
-        # WORK HERE!!
+ 
+        for sent in sents:
+            for token in sent:
+                voc.add(token)
+
+        voc.add("</s>")
+        self._voc = voc
 
         self._V = len(voc)  # vocabulary size
 
@@ -165,9 +183,22 @@ class AddOneNGram(NGram):
         token -- the token.
         prev_tokens -- the previous n-1 tokens (optional only if n = 1).
         """
-        # WORK HERE!!
 
+        if self._n > 1:
+            denominator = self.count(prev_tokens)
+            numerator_list = list(prev_tokens)
+        else:
+            denominator = self.count(()) 
+            numerator_list = []
 
+        numerator_list.append(token)
+        numerator = self.count(tuple(numerator_list)) + 1
+        denominator += self.V()
+
+        prob = numerator/denominator
+
+        return prob
+        
 class InterpolatedNGram(NGram):
 
     def __init__(self, n, sents, gamma=None, addone=True):

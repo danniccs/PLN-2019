@@ -1,6 +1,6 @@
 from collections import defaultdict
 from numpy import random
-
+from locale import strxfrm
 
 class NGramGenerator(object):
 
@@ -30,8 +30,13 @@ class NGramGenerator(object):
 
         sorted_probs = {}
         for minusgram, prob in probs.items():
-            sorted_prob = sorted(prob.items(), key=lambda pair: pair[1],
-                                 reverse=True)
+            # ordeno por token y luego por la probabilidad; así se ordena por
+            # probabilidad y lexográficamente
+
+            sorted_prob = sorted(prob.items(),
+                                 key=lambda pair: strxfrm(pair[0]))
+            sorted_prob = sorted(sorted_prob,
+                                 key=lambda pair: pair[1], reverse=True)
             sorted_probs[minusgram] = sorted_prob
 
         self._sorted_probs = sorted_probs
