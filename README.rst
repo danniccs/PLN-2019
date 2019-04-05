@@ -69,3 +69,6 @@ Jupyter (IDE y notebooks)
 Correr Jupyter Lab (abre una ventana en el navegador por defecto)::
 
     jupyter lab
+
+Resultados:
+Al correr una evaluación del modelo con Add One, la log probabilidad da -infinito, lo cual puede estar siendo causado por un underflow error, haciendo la probabilidad de alguna oración 0.

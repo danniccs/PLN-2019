@@ -3,7 +3,7 @@ from collections import defaultdict
 import math
 
 
-class LanguageModel(object):
+class LanguageModel():
 
     def sent_prob(self, sent):
         """Probability of a sentence. Warning: subject to underflow problems.
@@ -36,15 +36,15 @@ class LanguageModel(object):
         sents -- the sentences.
         """
         # calculate log probability again so as not to go over list twice
-        M = 0
+        big_m = 0
         log_sum = 0
 
         for sent in sents:
-            for token in sent:
-                M += 1
+            for _ in sent:
+                big_m += 1
             log_sum += self.sent_log_prob(sent)
 
-        return -1*(log_sum / M)
+        return -1*(log_sum / big_m)
 
     def perplexity(self, sents):
         """Perplexity of a list of sentences.
