@@ -53,6 +53,7 @@ class LanguageModel(object):
         """
         return 2 ** self.cross_entropy(sents)
 
+
 class NGram(LanguageModel):
 
     def __init__(self, n, sents):
@@ -102,7 +103,7 @@ class NGram(LanguageModel):
             denominator = self.count(prev_tokens)
             numerator_list = list(prev_tokens)
         else:
-            denominator = self.count(()) 
+            denominator = self.count(())
             numerator_list = []
 
         numerator_list.append(token)
@@ -129,7 +130,7 @@ class NGram(LanguageModel):
             prev = tuple(fixed_sent[i - (n - 1):i])
             word = fixed_sent[i]
 
-            if prev is not (): 
+            if prev != ():
                 prob *= self.cond_prob(word, prev)
             else:
                 prob *= self.cond_prob(word)
@@ -150,6 +151,7 @@ class NGram(LanguageModel):
 
         return log_prob
 
+
 class AddOneNGram(NGram):
 
     def __init__(self, n, sents):
@@ -162,7 +164,7 @@ class AddOneNGram(NGram):
 
         # compute vocabulary
         self._voc = voc = set()
- 
+
         for sent in sents:
             for token in sent:
                 voc.add(token)
@@ -188,17 +190,16 @@ class AddOneNGram(NGram):
             denominator = self.count(prev_tokens)
             numerator_list = list(prev_tokens)
         else:
-            denominator = self.count(()) 
+            denominator = self.count(())
             numerator_list = []
 
         numerator_list.append(token)
         numerator = self.count(tuple(numerator_list)) + 1
         denominator += self.V()
 
-        prob = numerator/denominator
+        return numerator/denominator
 
-        return prob
-        
+
 class InterpolatedNGram(NGram):
 
     def __init__(self, n, sents, gamma=None, addone=True):
@@ -222,15 +223,31 @@ class InterpolatedNGram(NGram):
             held_out_sents = sents[m:]
 
         print('Computing counts...')
-        # WORK HERE!!
+
         # COMPUTE COUNTS FOR ALL K-GRAMS WITH K <= N
+        count = defaultdict(int)
+
+        for sent in sents:
+            for k in range(0, n + 1):
+
+                sent_fixed = (k-1)*['<s>'] + sent + ['</s>']
+
+                for i in range(len(sent_fixed) - k + 1):
+                    ngram = tuple(sent_fixed[i:i+k])
+                    count[ngram] += 1
+
+        self._count = dict(count)
 
         # compute vocabulary size for add-one in the last step
         self._addone = addone
         if addone:
             print('Computing vocabulary...')
             self._voc = voc = set()
-            # WORK HERE!!
+            for sent in sents:
+                for token in sent:
+                    voc.add(token)
+
+            self._voc = voc
 
             self._V = len(voc)
 
@@ -247,7 +264,7 @@ class InterpolatedNGram(NGram):
 
         tokens -- the k-gram tuple.
         """
-        # WORK HERE!! (JUST A RETURN STATEMENT)
+        return self._count.get(tokens, 0)
 
     def cond_prob(self, token, prev_tokens=None):
         """Conditional probability of a token.
@@ -255,4 +272,35 @@ class InterpolatedNGram(NGram):
         token -- the token.
         prev_tokens -- the previous n-1 tokens (optional only if n = 1).
         """
-        # WORK HERE!!
+        glob_gamma = self._gamma
+        accum = 1
+        prob = 0
+        gamma = 0
+
+        prev_i = prev_tokens
+
+        for i in range(self._n, 0, -1):
+            if i > 1:
+                gamma = accum * self.count(prev_i)
+                gamma = gamma * (1 / (self.count(prev_i) + glob_gamma))
+                accum = accum - gamma
+                denominator = self.count(prev_i)
+                numerator_list = list(prev_i)
+            else:
+                gamma = accum
+                denominator = self.count(())
+                numerator_list = []
+
+            numerator_list.append(token)
+            numerator = self.count(tuple(numerator_list))
+
+            if i == 1 and self._addone:
+                numerator = numerator + 1
+                denominator = denominator + self._V
+
+            if prev_i is not None:
+                prev_i = (prev_i)[1:len(prev_i)]
+
+            prob = prob + gamma * (numerator / denominator)
+
+        return prob

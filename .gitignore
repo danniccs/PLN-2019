@@ -4,3 +4,6 @@ pln_2019.egg-info/
 ScreenplayTXTs/
 __pycache__/
 tst.txt
+script_corpus_train/
+script_corpus_eval/
+addone_*

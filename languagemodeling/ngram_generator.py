@@ -2,6 +2,7 @@ from collections import defaultdict
 from numpy import random
 from locale import strxfrm
 
+
 class NGramGenerator(object):
 
     def __init__(self, model):
@@ -61,7 +62,7 @@ class NGramGenerator(object):
                     prev_tokens = prev_tokens[1:len(prev_tokens)]
                     aux = list(prev_tokens)
                     aux.append(cur_token)
-                    prev_tokens = tuple(aux) 
+                    prev_tokens = tuple(aux)
                 else:
                     prev_tokens = ()
 
@@ -73,7 +74,7 @@ class NGramGenerator(object):
         prev_tokens -- the previous n-1 tokens (optional only if n = 1).
         """
 
-        if prev_tokens != None:
+        if prev_tokens is not None:
             token_probs = self._sorted_probs[prev_tokens]
         else:
             token_probs = self._sorted_probs[()]
@@ -81,5 +82,5 @@ class NGramGenerator(object):
         tokens_tuple, probs_tuple = zip(*token_probs)
         tokens = list(tokens_tuple)
         probs = list(probs_tuple)
- 
+
         return random.choice(tokens, p=probs)

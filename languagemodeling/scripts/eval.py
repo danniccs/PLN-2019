@@ -1,18 +1,18 @@
 """Evaulate a language model using a test set.
 
 Usage:
-  eval.py -i <file>
+  eval.py -i <file> -r <dir>
   eval.py -h | --help
 
 Options:
   -i <file>     Language model file.
+  -r <dir>      Training corpus directory.
   -h --help     Show this screen.
 """
 from docopt import docopt
 import pickle
-import math
 
-from nltk.corpus import gutenberg
+from nltk.corpus import PlaintextCorpusReader
 
 
 if __name__ == '__main__':
@@ -24,15 +24,15 @@ if __name__ == '__main__':
     model = pickle.load(f)
     f.close()
 
-    # load the data
-    # WORK HERE!! LOAD YOUR EVALUATION CORPUS
-    sents = gutenberg.sents('austen-persuasion.txt')
+    screenplay_dir = opts['-r']
+    my_corpus = PlaintextCorpusReader(screenplay_dir, '.*.txt')
 
-    # compute the cross entropy
-    # WORK HERE!!
-    log_prob = None
-    e = None
-    p = None
+    sents = my_corpus.sents()
+
+    # compute the log probability, cross entropy and perplexity
+    log_prob = model.log_prob(sents)
+    e = model.cross_entropy(sents)
+    p = model.perplexity(sents)
 
     print('Log probability: {}'.format(log_prob))
     print('Cross entropy: {}'.format(e))

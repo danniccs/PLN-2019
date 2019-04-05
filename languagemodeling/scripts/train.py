@@ -20,19 +20,20 @@ import pickle
 
 from nltk.corpus import PlaintextCorpusReader
 
-from languagemodeling.ngram import NGram
+from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram
 
 
 models = {
-    'ngram': NGram,
+    'ngram'  : NGram,
+    'addone' : AddOneNGram,
+    'inter'  : InterpolatedNGram,
 }
 
 
 if __name__ == '__main__':
     opts = docopt(__doc__)
 
-    # load the data
-    # WORK HERE!! LOAD YOUR TRAINING CORPUS
+    # load the corpus
     screenplay_dir = opts['-r']
     my_corpus = PlaintextCorpusReader(screenplay_dir, '.*.txt')
 
